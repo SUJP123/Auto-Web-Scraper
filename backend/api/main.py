@@ -18,10 +18,8 @@ def scrape_url_for_all(scrape : Scrape):
     page_source = scrape.scroll_infinite_page(driver)
 
     types, names, found, sames = scrape.find_param_values(page_source)
-    print(names)
-    print(sames)
-
     print(f"Params that were found: {found}")
+    print(types)
 
     df = scrape.collect_data(page_source, names, types, sames)
 

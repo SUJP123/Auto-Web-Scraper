@@ -55,6 +55,7 @@ class Scrape(BaseModel):
         sames = [ ]
         samples = BeautifulSoup(page_source, "html.parser")
 
+
         # Handle case for when class name for grid/table item isn't specified
         if self.initialClass == "":
             sample = samples.find_all(self.initialType)
@@ -84,19 +85,26 @@ class Scrape(BaseModel):
                     forward += 1
                 if "<" in html[back:initial_index] and ">" in html[initial_index:forward]:
                     reduced = html[back:forward]
-                    i = reduced.index("class") + len("class=")
-                    j = i+1
+
+                    # Default val, for later in try/except block
+                    exception = True
+
+                    try:
+                        i = reduced.index("class") + len("class=")
+                        j = i+1
+                    except:
+                        exception = False
 
                     # Find Type
                     k = back + 1
                     while True:
-                        if html[k] == ' ':
+                        if html[k] == ' ' or html[k] == '>':
                             typ = html[back+1:k]
                             break
                         k += 1
 
                     #Find Class Name
-                    while True:
+                    while True and exception:
                         if reduced[j] == "'" or reduced[j] == '"' or reduced[j] == " ":
                             res = reduced[i+1:j]
                             break
@@ -128,13 +136,18 @@ class Scrape(BaseModel):
         valids = [ ]
 
         count = 0
-        for item in soup.find_all(self.initialType, class_=self.initialClass)[self.num_start:4]:
+        if self.initialClass == '':
+            items = soup.find_all(self.initialType)
+        else:
+            items = soup.find_all(self.initialType, class_=self.initialClass)
+
+        for item in items[self.num_start:10]:
             repeats = [ ]
 
-            #Ensure sleep to provide sites from detecting scraping
-            #time_sleep = random.choice(range(3,7))
-            #time.sleep(time_sleep)
-            #print(f"Sleeping for {time_sleep}")
+            # Ensure sleep to provide sites from detecting scraping
+            time_sleep = random.choice(range(3,7))
+            time.sleep(time_sleep)
+            print(f"Sleeping for {time_sleep}")
 
 
             for i in range(len(names)):
@@ -192,7 +205,6 @@ class Scrape(BaseModel):
                             break
             count += 1                   
         # Convert to np array
-        print(data)     
         data = np.array(data)
 
         # Construct DF from numpy array
