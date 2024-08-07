@@ -66,14 +66,24 @@ class Scrape(BaseModel):
         #Find param values
         for param in self.params:
             html = f"""{sample}"""
+            print("Running param find")
             try:
                 initial_index = html.index('>' + param + '<')
             except:
                 print(f"First test for param {param} failed")
                 try:
-                    initial_index = html.index(param)
+                    initial_index = html.index('>"' + param +'"<')
                 except:
                     print(f"Second test failed")
+                    try: 
+                        initial_index = html.index('"' + param + '"')
+                    except:
+                        print(f"third Test Failed")
+                        try:
+                            initial_index = html.index(param)
+                        except:
+                            print(f'Last Test Failed')
+                            continue
 
             back = initial_index-1
             forward = initial_index+1
@@ -133,7 +143,7 @@ class Scrape(BaseModel):
         data = [[]] * len(names)
 
         # For tracking var_list searches
-        valids = [ ]
+        valids = [[]] * (len(sames)//2)
 
         count = 0
         if self.initialClass == '':
@@ -143,6 +153,7 @@ class Scrape(BaseModel):
 
         for item in items[self.num_start:10]:
             repeats = [ ]
+            print(valids)
 
             # Ensure sleep to provide sites from detecting scraping
             time_sleep = random.choice(range(3,7))
@@ -152,7 +163,7 @@ class Scrape(BaseModel):
 
             for i in range(len(names)):
                 # Ensure repeats aren't done twice
-                print(f"i: {i}")
+                print(f"i, repeats: {i}, {repeats}")
                 if i in repeats:
                     continue
 
@@ -172,10 +183,13 @@ class Scrape(BaseModel):
                     for x in range(len(var_list)):
                         # Keep track of correct indexes for var_list
                         param_index = sames[index+1][same_index]
-                        if var_list[x].text != '' and (self.validate_search(var_list[x].text, param_index) if count == 0 else self.validate_repeat_index(x, valids)):
-                            
-                            if count == 0 and x not in valids:
-                                valids.append(x)
+                        if var_list[x].text != '' and (self.validate_search(var_list[x].text, param_index) if count == 0 else self.validate_repeat_index(x, valids[index//2])):
+                            print(var_list[x].text)
+                            print(same_index)
+                            print(sames[index+1])
+                            print(f"x: {x}")
+                            if count == 0 and x not in valids[index//2]:
+                                valids[index//2] = valids[index//2] + [x]
 
                             ind = sames[index+1][same_index]
 
