@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const authRoutes = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
@@ -12,7 +13,7 @@ const app = express();
 // Set up env access
 dotenv.config({path:__dirname+'/./../../.env'});
 
-var corOptions = 
+app.use(cors())
 
 // middleware
 app.use(express.json());
@@ -23,26 +24,15 @@ const username = encodeURIComponent(process.env.DB_USERNAME);
 const password = encodeURIComponent(process.env.DB_PASSWORD);
 
 const uri = `mongodb+srv://${username}:${password}@scraper.jht70.mongodb.net/?retryWrites=true&w=majority&appName=${name}`
-const client = new MongoClient(uri, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    }
-  });
-  async function run() {
-    try {
-      // Connect the client to the server	(optional starting in v4.7)
-      await client.connect();
-      // Send a ping to confirm a successful connection
-      await client.db("admin").command({ ping: 1 });
-      console.log("Pinged your deployment. You successfully connected to MongoDB!");
-    } finally {
-      // Ensures that the client will close when you finish/error
-      await client.close();
-    }
-  }
-  run().catch(console.dir);
+
+try {
+    mongoose.connect(uri); 
+    console.log("Connected to MongoDB");
+} catch(error) {
+    console.error(error);
+}
+
+
 
 // routes
 app.get('*', checkUser);
