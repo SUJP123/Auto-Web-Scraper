@@ -25,8 +25,11 @@ const password = encodeURIComponent(process.env.DB_PASSWORD);
 
 const uri = `mongodb+srv://${username}:${password}@scraper.jht70.mongodb.net/?retryWrites=true&w=majority&appName=${name}`
 
+const connectionpOptions = {
+  dbName: process.env.DB}
+
 try {
-    mongoose.connect(uri); 
+    mongoose.connect(uri, connectionpOptions); 
     console.log("Connected to MongoDB");
 } catch(error) {
     console.error(error);
