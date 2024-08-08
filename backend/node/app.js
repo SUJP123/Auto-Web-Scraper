@@ -13,7 +13,13 @@ const app = express();
 // Set up env access
 dotenv.config({path:__dirname+'/./../../.env'});
 
-app.use(cors())
+
+var corsOptions = {
+  origin: 'http://localhost:4200'}
+  
+app.use(cors(
+    corsOptions
+))
 
 // middleware
 app.use(express.json());

@@ -1,0 +1,60 @@
+<link rel="stylesheet" type="text/css" href="home.component.css">
+<div class="home-grid">
+    <div class="flex-column">
+        <div class="padding-1 justify-center">
+            <h1 class='font-1'>Welcome to Auto-Scraper</h1>
+        </div>
+        <br>
+        <div class="padding-3">
+            <p>Effortlessly scrape simple websites and collect data for your</p>
+            <p>projects in 3 simple steps!</p>
+            <br>
+            <ul>
+                <label>How to use:</label>
+                <li>Type the url of the site you want to webscrape</li>
+                <li>Find the repeating class and type in the html</li>
+                <li>Type the parameters you want scraped and your DONE!</li>
+            </ul>
+
+        </div>
+    </div>
+    <div class='padding-2'>
+        <p>Don't have an account, sign up here</p>
+        
+        <div>
+            <div>
+                <p>Register Here</p>
+                <div>
+                    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        
+                        <div>
+                            <label for="email" class="block font-medium">
+                                Email
+                            </label>
+                            <input id="email" type="text" formControlName="email" placeholder="Enter email..." class="border border-gray-300 rounded-lg" required>
+                        </div>
+        
+                        <div>
+                            <label for="password" class="block font-medium">
+                                Password
+                            </label>
+                            <input id="password" type="password" formControlName="password" placeholder="Enter password..." class="border border-gray-300 rounded-lg" required>
+                        </div>
+        
+                        <div>
+                            <label for="confirmPassword" class="block font-medium">
+                                Confirm Password
+                            </label>
+                            <input id="confirm-password" type="password" formControlName="confirmPassword" placeholder="Confirm password..." class="border border-gray-300 rounded-lg" required>
+                        </div>
+        
+                        <div>
+                            <button type="submit" class="border border-gray-300 hover:bg-blue-100 font-medium">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        
+        </div>
+    </div>
+</div>
