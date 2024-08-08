@@ -1,1 +1,25 @@
-<p>login works!</p>
+<div>
+    <div class="flex justify-center align-center">
+        Login
+    </div>
+    <div class="flex justify-center align-center">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <div>
+                    <label for="email" class="">
+                        Email
+                    </label>
+                    <input id="email" type="text" formControlName="email" placeholder="Enter email..." class="" required>
+                </div>
+                    <label for="password" class="">
+                        Password
+                    </label>
+                    <input id="password" type="password" formControlName="password" placeholder="Enter password..." class="" required>
+                <div>
+
+                </div>
+                    <button type="submit" class="border border-gray-300 hover:bg-blue-100 font-medium">Login</button>
+                <div>
+            </div>
+        </form>
+    </div>
+</div>

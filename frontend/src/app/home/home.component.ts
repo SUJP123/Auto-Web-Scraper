@@ -1,17 +1,18 @@
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import{ RouterOutlet, RouterModule, Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterOutlet, RouterModule],
   styleUrl: './home.component.css',
   templateUrl: `./home.component.html`,
 })
 
 export class HomeComponent {
-  
+
   registerForm = this.formBuilder.group({
     email: '',
     password: '',
@@ -21,12 +22,16 @@ export class HomeComponent {
 
   constructor(
     private formBuilder: FormBuilder,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) {}
 
-
+  navigateToLogin() {
+    this.router.navigate(['/login']);
+  }
 
   onSubmit(): void {
+
     let registerData = this.registerForm.value
 
     const httpOptions = {
@@ -35,15 +40,25 @@ export class HomeComponent {
       })
     };
 
-    if (registerData.password === registerData.confirmPassword) {
+    if (registerData.password != null && registerData.password === registerData.confirmPassword) {
+      if (registerData.password.length < 6 ) {
+        return alert("Password must be a minimum length of 6.")
+      } else {
       this.http.post('http://localhost:5001/signup', {
         "email" : registerData.email,
         "password": registerData.password
-      }, httpOptions).subscribe() 
-      alert("Succesfully Registered")
-      }
+      }, httpOptions).subscribe(
+        (response) => {
+          // Handle the successful response
+          alert("Succesfully Logged In");
+          this.navigateToLogin();
+        },
+        (error) => {
+          alert("Email already in use. Try Loggin in."); // Centralized error handling
+        });
+    } }
     else {
-      alert("Passwords do not match")
+      alert("Passwords Do Not Match.")
     }
   }
 }
