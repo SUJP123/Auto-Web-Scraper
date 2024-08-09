@@ -151,9 +151,8 @@ class Scrape(BaseModel):
         else:
             items = soup.find_all(self.initialType, class_=self.initialClass)
 
-        for item in items[self.num_start:10]:
+        for item in items:
             repeats = [ ]
-            print(valids)
 
             # Ensure sleep to provide sites from detecting scraping
             time_sleep = random.choice(range(3,7))
@@ -163,7 +162,6 @@ class Scrape(BaseModel):
 
             for i in range(len(names)):
                 # Ensure repeats aren't done twice
-                print(f"i, repeats: {i}, {repeats}")
                 if i in repeats:
                     continue
 
@@ -184,10 +182,7 @@ class Scrape(BaseModel):
                         # Keep track of correct indexes for var_list
                         param_index = sames[index+1][same_index]
                         if var_list[x].text != '' and (self.validate_search(var_list[x].text, param_index) if count == 0 else self.validate_repeat_index(x, valids[index//2])):
-                            print(var_list[x].text)
-                            print(same_index)
-                            print(sames[index+1])
-                            print(f"x: {x}")
+
                             if count == 0 and x not in valids[index//2]:
                                 valids[index//2] = valids[index//2] + [x]
 
@@ -220,6 +215,7 @@ class Scrape(BaseModel):
             count += 1                   
         # Convert to np array
         data = np.array(data)
+        print(data)
 
         # Construct DF from numpy array
         df = pd.DataFrame(columns = self.param_names)
