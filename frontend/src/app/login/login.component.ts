@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +20,8 @@ export class LoginComponent {
 
     constructor(
       private formBuilder: FormBuilder,
-      private http: HttpClient
+      private http: HttpClient,
+      private router: Router
     ) {}
 
     onSubmit() {
@@ -34,7 +36,22 @@ export class LoginComponent {
       this.http.post('http://localhost:5001/login', {
         "email": loginData.email,
         "password": loginData.password
-      }, httpOptions).subscribe();
+      }, httpOptions).subscribe(
+        (response: any) => {
+          alert("Successfully Logged In");
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('email', response.email);
+          this.navigateDashboard();
+        },
+        (error) => {
+          alert("Login Failed");
+          console.error(error);
+        }
+      );
 
+    }
+
+    navigateDashboard() {
+      this.router.navigate(['/dashboard']);
     }
 }

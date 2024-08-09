@@ -50,7 +50,7 @@ export class HomeComponent {
       }, httpOptions).subscribe(
         (response) => {
           // Handle the successful response
-          alert("Succesfully Logged In");
+          alert("Succesfully Registered");
           this.navigateToLogin();
         },
         (error) => {
