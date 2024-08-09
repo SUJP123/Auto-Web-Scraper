@@ -54,9 +54,11 @@ export class HomeComponent {
           this.navigateToLogin();
         },
         (error) => {
-          alert("Email already in use. Try Loggin in."); // Centralized error handling
+          alert("Email already in use. Try Loggin in.");
         });
-    } }
+    } 
+  }
+
     else {
       alert("Passwords Do Not Match.")
     }

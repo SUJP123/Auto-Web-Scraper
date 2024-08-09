@@ -40,7 +40,8 @@ export class LoginComponent {
         (response: any) => {
           alert("Successfully Logged In");
           localStorage.setItem('token', response.token);
-          localStorage.setItem('email', response.email);
+          localStorage.setItem('id', response.user);
+          console.log(localStorage)
           this.navigateDashboard();
         },
         (error) => {
