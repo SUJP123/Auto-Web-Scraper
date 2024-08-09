@@ -1,22 +1,7 @@
-.home-grid {
-    display : grid;
-    grid-template-columns: auto auto;
-}
-
-.padding-1 {
-    padding-left: 10%;
-    padding-top: 20%;
-}
-
-.padding-2 {
-    padding-top: 20%;
-}
-
-.padding-3 {
-    padding-top:10%;
-    padding-left:10%;
-}
-
-.font-1 {
-    font-size: 300%;
+.bg-scraper {
+    background-image: url(../../assets/scraper.png);
+    background-position-x: 0%;
+    background-position-y: 100%;
+    background-size: 40%;
+    background-repeat: no-repeat;
 }
