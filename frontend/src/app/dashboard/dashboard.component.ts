@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 @Component({
@@ -19,21 +19,26 @@ export class DashboardComponent {
   column_length: number;
   button_length: number;
 
-  constructor(private fb: FormBuilder,
-              private router: Router,
-              private http: HttpClient
+  constructor(
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private http: HttpClient
   ) {
-    this.initial_length = 1,
-    this.param_length = 1,
-    this.column_length = 1,
-    this.button_length = 1,
-    this.apiForm = this.fb.group({
+    this.initial_length = 1;
+    this.param_length = 1;
+    this.column_length = 1;
+    this.button_length = 1;
+
+    this.apiForm = this.formBuilder.group({
       url: ['', Validators.required],
-      initial: this.fb.array([this.createInitialGroup()]),
-      params: this.fb.array([this.createParamGroup()]),
-      columns: this.fb.array([this.createColumnsGroup()]),
-      headers: ['', Validators.required],
-      buttons: this.fb.array([this.createButtonGroup()]),
+      initial: this.formBuilder.group({
+        initialValue: [''],
+        initialType: ['']
+      }),
+      params: this.formBuilder.array([this.createParamGroup()]),
+      columns: this.formBuilder.array([this.createColumnsGroup()]),
+      headers: this.formBuilder.array(['User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0']),
+      buttons: this.formBuilder.array([this.createButtonGroup()]),
       format: ['', Validators.required],
       scrapeType: ['', Validators.required],
       numStart: [0, Validators.required],
@@ -58,15 +63,8 @@ export class DashboardComponent {
     return this.apiForm.get('columns') as FormArray;
   }
 
-  createInitialGroup(): FormGroup {
-    return this.fb.group({
-      initialValue: [''],
-      initialType: ['', Validators.required]
-    });
-  }
-
   createParamGroup(): FormGroup {
-    return this.fb.group({
+    return this.formBuilder.group({
       param1: ['', Validators.required],
       param2: [''],
       param3: ['', Validators.required],
@@ -75,23 +73,19 @@ export class DashboardComponent {
   }
 
   createButtonGroup(): FormGroup {
-    return this.fb.group({
-      buttonClass: [''],
-      buttonType: ['' ],
-      buttonValue: ['']
+    return this.formBuilder.group({
+      buttonClass: ['', Validators.required],
+      buttonType: ['', Validators.required],
+      buttonValue: ['', Validators.required]
     });
   }
 
   createColumnsGroup(): FormGroup {
-    return this.fb.group({
+    return this.formBuilder.group({
       columnName: ['', Validators.required]
     });
   }
 
-  addInitial() {
-    this.initial_length += 1;
-    this.initial.push(this.createInitialGroup());
-  }
 
   addParam() {
     this.param_length += 1;
@@ -141,20 +135,32 @@ export class DashboardComponent {
   }
 
   onSubmit() {
+    if (this.apiForm.invalid) {
+      alert('Form is invalid');
+      return;
+    }
+
     let formData = this.apiForm.value;
     const payload = {
-      url: formData.url,
-      initial: formData.initial.map((init: any) => ({ value: init.initialValue, type: init.initialType })),
+      "url": formData.url,
+      initial: [formData.initial.initialValue, formData.initial.initialType],
       params: formData.params.map((param: any) => [param.param1, param.param2, param.param3, param.param4]),
       columns: formData.columns.map((column: any) => column.columnName),
       headers: formData.headers,
-      buttons: formData.buttons.map((button: any) => ({ class: button.buttonClass, type: button.buttonType, value: button.buttonValue })),
+      buttons: formData.buttons.map((button: any) => [button.buttonClass, button.buttonType, button.buttonValue]),
       format: formData.format,
       scrape_type: formData.scrapeType,
       num_start: formData.numStart
     };
+    console.log(payload);
 
-    this.http.post('http://127.0.0.1:8000/scrape/forall', payload)
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      })
+    };
+
+    this.http.post('http://127.0.0.1:8000/scrape/forall', payload, httpOptions)
       .subscribe(response => {
         console.log('Scrape response:', response);
       }, error => {

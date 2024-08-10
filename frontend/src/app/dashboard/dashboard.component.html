@@ -30,11 +30,9 @@
             </div>
             <div>
               <label class="block font-medium text-lg mb-2">Initial Values</label>
-              <div formArrayName="initial">
-                <div *ngFor="let initial of initial.controls; let i = index" [formGroupName]="i" class="space-y-2 relative">
-                  <input formControlName="initialValue" placeholder="Enter initial class name, if no class then leave blank" class="w-full border border-gray-300 rounded-md p-2">
-                  <input formControlName="initialType" placeholder="Enter initial type" class="w-full border border-gray-300 rounded-md p-2">
-                </div>
+              <div formGroupName="initial" class="space-y-2 relative">
+                <input formControlName="initialValue" placeholder="Enter initial class name, if no class then leave blank" class="w-full border border-gray-300 rounded-md p-2">
+                <input formControlName="initialType" placeholder="Enter initial type" class="w-full border border-gray-300 rounded-md p-2">
               </div>
             </div>
             <div>
@@ -59,10 +57,6 @@
                 </div>
               </div>
               <button type="button" (click)="addColumn()" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg">Add Column</button>
-            </div>
-            <div>
-              <label for="headers" class="block font-medium text-lg mb-2">Headers</label>
-              <input id="headers" formControlName="headers" placeholder="Enter headers" class="w-full border border-gray-300 rounded-md p-2">
             </div>
             <div>
               <label class="block font-medium text-lg mb-2">Buttons</label>

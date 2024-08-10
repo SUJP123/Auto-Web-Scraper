@@ -62,7 +62,6 @@ class Scrape(BaseModel):
             last_height = new_height
 
     def find_items(self, driver):
-
         soup = BeautifulSoup(driver.page_source, features='lxml')
         items = soup.find_all(self.initial[1], class_=self.initial[0])
         return items[self.num_start:]
