@@ -44,7 +44,7 @@ class Scrape(BaseModel):
 
     def initialize(self):
         options = Options()
-        # options.add_argument('--headless')
+        options.add_argument('--headless')
         options.add_argument(f'--user-agent={self.headers[1]}')
         driver = webdriver.Chrome(options=options)
         driver.get(self.url)
@@ -127,7 +127,7 @@ class Scrape(BaseModel):
             if button.get_attribute(button_attr) == button_value:
                 button.click()
                 time.sleep(2)  # Wait for the page to load
-                return
+                return 
 
     def convert_data_to_df(self, data):
         print(data)

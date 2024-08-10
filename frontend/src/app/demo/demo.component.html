@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NBA Stats Scraper Demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans leading-normal tracking-normal">
+
+  <div class="container mx-auto p-4">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-4 text-center">NBA Stats Scraper Demo</h1>
+        <div class="flex justify-center">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" (click)="navigateToDashboard()">Back To Dashboard</button>
+        </div>
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">Let's scrape the <a href="https://www.nba.com/stats/leaders" class="text-blue-500 underline">https://www.nba.com/stats/leaders</a> site! As you can see, the site is filled with players and stats for each player.</p>
+      <img src="../../assets/first.png" alt="NBA Stats Leaderboard" class="max-w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">First input the site URL into the URL input box.</p>
+      <img src="../../assets/second.png" alt="Input URL" class="max-w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">Now let's figure out what we want to scrape. Let's say I want to scrape the player name, their team, and the number of games they played (gp). We must first find what the repeating HTML is for each player in the table rows. So let's open up the page source.</p>
+      <img src="../../assets/third.png" alt="Page Source" class="max-w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">As you can see, each player and their stats are in a <code>&lt;tr&gt;</code> tag with no class name. So let's input the initial values as this.</p>
+      <img src="../../assets/fourth.png" alt="Initial Values" class="max-w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">Next, let's find the locations of the data we want to collect. Let's do this for the first player, Joel Embiid in this case. As you can see, I have located the 3 stats I'm looking for:</p>
+      <img src="../../assets/fifth.png" alt="First Player Stats" class="max-w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">The player name, Joel Embiid, is in a class called <code>Anchor_anchor__cSc3P</code> in an <code>&lt;a&gt;</code> tag. This also goes for the team name, PHI. Now for the games played value of 6, we can see that it has no class name and is in a <code>&lt;td&gt;</code> tag. With this in mind, here's how the params should be added:</p>
+      <img src="../../assets/sixth.png" alt="Parameters" class="max-w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">Note: If you want to scrape the entire page, make your parameters correspond with the first set of repeated HTMLs. For example, if instead we used LeBron James' stats for the values instead of Joel Embiid's, we wouldn't scrape the data of any player who ranks above LeBron. Also, note that we used text here because the parameter we're looking for is text between tags. If you're looking for data inside a tag like the values of 'src' or 'href' of a specific tag, then put the value you want instead, e.g., src, href.</p>
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+        <p class="text-xl">Now select column names to appear in your data for each of the params you entered. You can choose whatever names you want for this part, so I'll go with these:</p>
+        <img src="../../assets/seventh.png" alt="Columns" class="max-w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">Now if you go on the site, we can see that not all of the data is present, and there's actually a button to go to the next page. When we scrape our data, we want to also go to the rest of the pages to ensure we get every player. So let's find the button in the HTML.</p>
+      <img src="../../assets/eighth.png" alt="Next Page Button" class="max-w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">Here we can see the next page button, but the issue is that the previous page button shares the same class name as it. So to ensure that we don't use the wrong button, let's select a unique identifier in the button tag. For example, I can pick the title element which has a value of "Next Page Button".</p>
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">So I will put it in the form like this.</p>
+      <img src="../../assets/ninth.png" alt="Button Class and Title" class="max-w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+    <div class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <p class="text-xl">Now for the rest of the form, let's go through each section. The return format is the format in which you will receive your data. For my purposes, I will choose csv.</p>
+      <br>
+      <p class="text-xl">As for scrape-type, we already decided earlier that we wanted to click a button to go through multiple pages. So select multi-page to ensure the scrape goes through smoothly.</p>
+      <br>
+      <p class="text-xl">Now for the index of when the param occurs, we base this number on what param values we used. In our case, we used Joel Embiid who's the first player in the table, and correspondingly, has the first <code>&lt;tr&gt;</code> tag in the HTML. So for us, we will select 0, as the 0 index means the first position.</p>
+      <br>
+      <p class="text-xl">Now let's click submit and see the results. This may take some time depending on the site, so come check in a bit!</p>
+      <br>
+      <p class="text-xl">Now here are the results:</p>
+      <br>
+      <img src="../../assets/tenth.png" alt="Final Result" class="max-w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+  </div>
+</body>
+</html>

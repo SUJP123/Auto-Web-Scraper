@@ -25,6 +25,7 @@ def scrape_url_for_all(scrape: Scrape):
     elif scrape.scrape_type == "multi-page":
         count = 0
         running = True
+        past_items = None
         while running:
             if count == 0:
                 first_page = True
@@ -32,10 +33,12 @@ def scrape_url_for_all(scrape: Scrape):
             scrape.scroll_infinite_page(driver)
 
             items = scrape.find_items(driver)
+            if past_items and past_items == items:
+                break
+            past_items = items.copy()
             data, valids = scrape.extract_params(items, first_page, past_valids)
             past_valids = valids
             all_data.append(data)
-
             buttons = scrape.find_buttons(driver)
             if not buttons:
                 break
