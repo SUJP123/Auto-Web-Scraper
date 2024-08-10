@@ -7,12 +7,14 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import requests
 from fastapi import FastAPI
+from fastapi.responses import StreamingResponse, JSONResponse
 import time
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 import random
 import os
+from io import StringIO, BytesIO
     
 
 class Scrape(BaseModel):
@@ -134,7 +136,10 @@ class Scrape(BaseModel):
         return df
 
     def return_csv(self, df, title: str):
-        return df.to_csv(title)
+        output = StringIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+        return StreamingResponse(output, media_type="text/csv", headers={"Content-Disposition": f"attachment;filename={title}"})
 
     def return_json(self, df):
         return df.to_json()

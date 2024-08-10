@@ -157,12 +157,18 @@ export class DashboardComponent {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-      })
+      }),
+      responseType: 'blob' as 'json'
     };
 
-    this.http.post('http://127.0.0.1:8000/scrape/forall', payload, httpOptions)
-      .subscribe(response => {
-        console.log('Scrape response:', response);
+    this.http.post<Blob>('http://127.0.0.1:8000/scrape/forall', payload, httpOptions)
+      .subscribe((response: Blob) => {
+        const a = document.createElement('a');
+        const objectUrl = URL.createObjectURL(response);
+        a.href = objectUrl;
+        a.download = 'data.csv';
+        a.click();
+        URL.revokeObjectURL(objectUrl);
       }, error => {
         console.error('Scrape error:', error);
       });

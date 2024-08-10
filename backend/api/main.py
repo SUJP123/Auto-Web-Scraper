@@ -74,8 +74,8 @@ def scrape_url_for_all(scrape: Scrape):
 
     # Return the data in the specified format
     if scrape.format == "csv":
-        return scrape.return_csv(df, title="example.csv")
+        return scrape.return_csv(df, title="data.csv")
     elif scrape.format == "json":
         return scrape.return_json(df)
     else:
-        return scrape.return_xlsx(df, title="example.xlsx")
+        return scrape.return_xlsx(df, title="data.xlsx")
