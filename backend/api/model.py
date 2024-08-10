@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from typing import Union
 from bs4 import BeautifulSoup
 import selenium
@@ -12,243 +12,136 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 import random
+import os
     
 
 class Scrape(BaseModel):
+    url: str
 
-    url : str
-    initialType : str
-    initialClass: str
-    params: List[str]
-    param_names:List[str]
-    headers : List[str]
-    format:str
-    num_start:int
+    # 0-> class for repeating section , 1-> tag_type for repeating section
+    initial: List[str]
+
+    # 0-> Value of First, 1-> Class Name, 2-> tag_type (div, str), 3-> Value_type (text, img, etc)
+    params: List[List[str]] 
+
+    # Column name for output
+    columns : List[str]
+
+    # Default for now, but implement specified and options after further research on headers
+    headers: List[str]
+
+    # 0-> Button class, 1-> Button Distinguishing feature type ex) title, id, 2-> Distinguishing value
+    buttons: List[List[str]]
+
+    # Scrape Type ex) Multi-Page, Single-Page, Repeated Button Clicks, etc...
+    scrape_type: str
+
+    # Return format
+    format: str
+
+    # start index for when values should be compared
+    num_start: int
 
     def initialize(self):
-        # Initialize driver
         options = Options()
-        options.add_argument('--headless')
+        # options.add_argument('--headless')
         options.add_argument(f'--user-agent={self.headers[1]}')
-
         driver = webdriver.Chrome(options=options)
         driver.get(self.url)
+        driver.maximize_window()
         return driver
-    
+
     def scroll_infinite_page(self, driver):
         last_height = driver.execute_script("return document.body.scrollHeight")
         while True:
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(1)  # Deal with loading
+            driver.execute_script("window.scrollTo(0, 100);")
+            time.sleep(1)
             new_height = driver.execute_script("return document.body.scrollHeight")
             if new_height == last_height:
                 break
             last_height = new_height
-    
-        page_source = driver.page_source
-        return page_source
-    
-    def find_param_values(self, page_source):
-        names = [ ]
-        types = [ ]
-        found = [ ]
-        sames = [ ]
-        samples = BeautifulSoup(page_source, "html.parser")
 
+    def find_items(self, driver):
 
-        # Handle case for when class name for grid/table item isn't specified
-        if self.initialClass == "":
-            sample = samples.find_all(self.initialType)
-        else:
-            sample = samples.find_all(self.initialType, class_=self.initialClass)
-        sample = sample[self.num_start] # Make this a changeable parameter
+        soup = BeautifulSoup(driver.page_source, features='lxml')
+        items = soup.find_all(self.initial[1], class_=self.initial[0])
+        return items[self.num_start:]
 
-        #Find param values
-        for param in self.params:
-            html = f"""{sample}"""
-            print("Running param find")
-            try:
-                initial_index = html.index('>' + param + '<')
-            except:
-                print(f"First test for param {param} failed")
-                try:
-                    initial_index = html.index('>"' + param +'"<')
-                except:
-                    print(f"Second test failed")
-                    try: 
-                        initial_index = html.index('"' + param + '"')
-                    except:
-                        print(f"third Test Failed")
-                        try:
-                            initial_index = html.index(param)
-                        except:
-                            print(f'Last Test Failed')
-                            continue
+    def extract_params(self, items, first_page: bool, past_valids):
 
-            back = initial_index-1
-            forward = initial_index+1
-            res = None
-            while True:
-                if not "<" in html[back:initial_index]:
-                    back -= 1
-                if not ">" in html[initial_index:forward]:
-                    forward += 1
-                if "<" in html[back:initial_index] and ">" in html[initial_index:forward]:
-                    reduced = html[back:forward]
+        # Initialize arrays from params
+        first_vals = [x[0] for x in self.params]
+        names = [x[1] for x in self.params]
+        tag_types = [x[2] for x in self.params]
+        val_types = [x[3] for x in self.params]
 
-                    # Default val, for later in try/except block
-                    exception = True
+        # Past valids to ensure new page doesn't reset valids
+        valids = past_valids
 
-                    try:
-                        i = reduced.index("class") + len("class=")
-                        j = i+1
-                    except:
-                        exception = False
-
-                    # Find Type
-                    k = back + 1
-                    while True:
-                        if html[k] == ' ' or html[k] == '>':
-                            typ = html[back+1:k]
-                            break
-                        k += 1
-
-                    #Find Class Name
-                    while True and exception:
-                        if reduced[j] == "'" or reduced[j] == '"' or reduced[j] == " ":
-                            res = reduced[i+1:j]
-                            break
-                        j += 1
-                    if not res:
-                        res = ' '
-                    if res:
-                        # Handle data that has the same class name
-                        if res in names and not res in sames:
-                            sames.append(res)
-                            sames.append([names.index(res), len(names)])
-                        elif res in sames:
-                            check = sames.index(res) + 1
-                            sames[check] = sames[check] + [len(names)]
-                
-                        # Append to all lists
-                        types.append(typ)
-                        names.append(res)
-                        found.append(param)
-                    break
-        return types, names, found, sames
-     
-    def collect_data(self, page_source, names, types, sames):
-
-        soup = BeautifulSoup(page_source, "html.parser")
+        # Initialize Data Array
         data = [[]] * len(names)
 
-        # For tracking var_list searches
-        valids = [[]] * (len(sames)//2)
-
         count = 0
-        if self.initialClass == '':
-            items = soup.find_all(self.initialType)
-        else:
-            items = soup.find_all(self.initialType, class_=self.initialClass)
-
         for item in items:
-            repeats = [ ]
+            for index in range(len(names)):
+                outs = item.find_all(tag_types[index], class_=names[index])
+                # Find indexes for find_all that correspond to type wanted
+                if count == 0 and first_page:
+                    valid_index = self.find_valid_index(outs, first_vals[index], val_types[index])
+                    valids.append(valid_index)
+                
+                out_index = valids[index]
 
-            # Ensure sleep to provide sites from detecting scraping
-            time_sleep = random.choice(range(3,7))
-            time.sleep(time_sleep)
-            print(f"Sleeping for {time_sleep}")
+                # Once indexes are found
+                output = self.remove_text_space(outs[out_index].text) if val_types[index] == "text" else outs[out_index][val_types[index]]
+                data[index] = data[index] + [output]
+            count += 1
+        return data, valids
 
+    def find_valid_index(self, outs, value, val_type):
+        for index in range(len(outs)):
+            if val_type == "text":
+                if self.remove_text_space(outs[index].text) == value:
+                    return index
+            elif outs[index][val_type] == value:
+                return index
+    
+    def find_buttons(self, driver):
+        soup = BeautifulSoup(driver.page_source, features='lxml')
+        found_buttons = []
+        for button_spec in self.buttons:
+            buttons = soup.find_all('button', class_=button_spec[0])
+            for button in buttons:
+                if button.get(button_spec[1]) == button_spec[2]:
+                    found_buttons.append((button_spec[0], button_spec[1], button_spec[2]))
+        return found_buttons
 
-            for i in range(len(names)):
-                # Ensure repeats aren't done twice
-                if i in repeats:
-                    continue
+    def click_button(self, driver, button_spec):
+        button_class, button_attr, button_value = button_spec
 
-                # Handle repeat class cases
-                if names[i] in sames:
-                    index = sames.index(names[i])
-                    repeats = repeats + sames[index+1]
+        # Buttons may share the same class, commonly done in htmls
+        buttons = driver.find_elements(By.CLASS_NAME, button_class)
 
-                    # For case when classes don't have name based on
-                    # previous convention in function find_param_values()
-                    if names[i] == ' ':
-                        var_list = item.find_all(types[i])
-                    else:
-                        var_list = item.find_all(types[i], class_=names[i])
+        # Isolate wanted button by distinguishing feature
+        for button in buttons:
+            if button.get_attribute(button_attr) == button_value:
+                button.click()
+                time.sleep(2)  # Wait for the page to load
+                return
 
-                    same_index = 0
-                    for x in range(len(var_list)):
-                        # Keep track of correct indexes for var_list
-                        param_index = sames[index+1][same_index]
-                        if var_list[x].text != '' and (self.validate_search(var_list[x].text, param_index) if count == 0 else self.validate_repeat_index(x, valids[index//2])):
-
-                            if count == 0 and x not in valids[index//2]:
-                                valids[index//2] = valids[index//2] + [x]
-
-                            ind = sames[index+1][same_index]
-
-                            # Ensure spaces between text and tag are gone
-                            new_text = self.remove_text_space(var_list[x].text)
-
-                            data[ind] = data[ind] + [new_text]
-                            same_index += 1
-                        #Ensure loop doesn't continue after vals are found
-                        if same_index == len(sames[index+1]):
-                            break
-
-                    continue
-
-                # Handle regular case
-                else:
-                    var = item.find_all(types[i], class_=names[i])
-
-                    # Check for cases where unrelated tags have same class name
-                    for v in var:
-                        if v.text != '':
-
-                            # Ensure spaces between text and tag are gone
-                            new_v = self.remove_text_space(v.text)
-
-                            data[i] = data[i] + [new_v]
-                            break
-            count += 1                   
-        # Convert to np array
-        data = np.array(data)
+    def convert_data_to_df(self, data):
         print(data)
-
-        # Construct DF from numpy array
-        df = pd.DataFrame(columns = self.param_names)
-        for j in range(len(data[0])):
-            c = [data[0][j]]
-            for i in range(1, len(data)):
-                c += [data[i][j]]
-            df.loc[j] = c
-
+        df = pd.DataFrame({self.columns[i]: data[i] for i in range(len(data))})
         return df
-    
-    def return_csv(self, df, title:str):
+
+    def return_csv(self, df, title: str):
         return df.to_csv(title)
-    
+
     def return_json(self, df):
         return df.to_json()
-    
-    def return_xlsx(self, df, title:str):
+
+    def return_xlsx(self, df, title: str):
         return df.to_excel(title)
-    
+
     def remove_text_space(self, string):
-        ns=""
-        for i in range(len(string)):
-            if(not string[i].isspace()) or ((1 <= i < len(string)-1) and not string[i-1].isspace() and not string[i+1].isspace()):
-                ns+=string[i]
-        return ns  
-    
-    def validate_search(self, html_text, param_index):
-        if (self.remove_text_space(html_text) == self.params[param_index]):
-            return True
-        return False
-    
-    def validate_repeat_index(self, x, valids):
-        if valids and x in valids:
-            return True
-        return False
+        return "".join([c for i, c in enumerate(string) if not c.isspace() or (1 <= i < len(string) - 1 and not string[i - 1].isspace() and not string[i + 1].isspace())])
