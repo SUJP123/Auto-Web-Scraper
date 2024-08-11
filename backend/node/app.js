@@ -15,7 +15,7 @@ dotenv.config({path:__dirname+'/./../../.env'});
 
 
 var corsOptions = {
-  origin: 'http://localhost:4200'}
+  origin: '*'}
   
 app.use(cors(
     corsOptions
