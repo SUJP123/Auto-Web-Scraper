@@ -1,7 +1,7 @@
 const express = require('express');
 
 const app = express();
-app.use(express.static(__dirname + '/dist/browser/frontend'));
+app.use(express.static(__dirname + '/dist/frontend/browser'));
 
 app.listen(process.env.PORT || 8080);
 
