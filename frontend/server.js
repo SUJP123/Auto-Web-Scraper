@@ -1,14 +1,28 @@
 const express = require('express');
+const path = require('path');
 
 const app = express();
-app.use(express.static(__dirname + '/dist/frontend/browser'));
+const staticPath = path.join(__dirname, 'dist/frontend/browser');
 
-app.listen(process.env.PORT || 8080);
+app.use((req, res, next) => {
+    const mime = import('mime');
 
+  app.use((req, res, next) => {
+    const type = mime.getType(req.path);
+    if (type) {
+      res.setHeader('Content-Type', type);
+    }
+    next();
+    });
+});
 
-app.get('/*', function(req,res) {
-    res.sendFile(__dirname+
-    '/dist/frontend/browser/index.html'); });
+app.use(express.static(staticPath));
 
+app.get('/*', (req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'));
+});
 
-console.log("running");
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
