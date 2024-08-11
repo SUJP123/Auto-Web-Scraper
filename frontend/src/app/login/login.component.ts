@@ -45,6 +45,7 @@ export class LoginComponent {
         alert("Successfully Logged In");
         localStorage.setItem('token', response.token);
         localStorage.setItem('id', response.user);
+        this.navigateDashboard();
       },
       (error) => {
         alert("Login Failed");

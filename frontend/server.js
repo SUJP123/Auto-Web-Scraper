@@ -5,10 +5,7 @@ const app = express();
 app.use(express.static(__dirname + '/dist/frontend/browser'));
 
 app.get('/*', (req, res) => {
-    const type = mime.getType(req.path);
-    if (type) {
-      res.setHeader('Content-Type', type);
-    }
+    res.setHeader('Content-Type', 'text/javascript');
     res.sendFile(__dirname +  '/dist/frontend/browser/index.html');
 });
 
