@@ -16,7 +16,7 @@
             "outputPath": "dist/frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "baseHref": "/frontend/",
+            "baseHref": "/frontend/browser",
             "polyfills": [
               "zone.js"
             ],
