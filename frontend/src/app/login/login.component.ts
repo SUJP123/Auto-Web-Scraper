@@ -34,7 +34,6 @@ export class LoginComponent {
         'Content-Type':  'application/json',
       })
     };
-    console.log(loginData);
 
     this.http.post('https://auto-scraper-922505351a64.herokuapp.com/login', {
       "email": loginData.email,

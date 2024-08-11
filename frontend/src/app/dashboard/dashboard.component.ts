@@ -162,7 +162,7 @@ export class DashboardComponent {
       responseType: 'blob' as 'json'
     };
     
-    this.http.post<Blob>(`http://127.0.0.1:8000/scrape/forall`, payload, httpOptions)
+    this.http.post<Blob>(`http://54.211.3.132/scrape/forall`, payload, httpOptions)
       .subscribe((response: Blob) => {
         const a = document.createElement('a');
         const objectUrl = URL.createObjectURL(response);

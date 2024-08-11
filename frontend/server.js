@@ -1,6 +1,15 @@
 const express = require('express');
+const cors = require('cors');
 
 const app = express();
+
+var corsOptions = [
+    '*'
+]
+
+app.use(cors(
+    corsOptions
+));
 
 app.use(express.static(__dirname + '/dist/frontend/browser'));
 
