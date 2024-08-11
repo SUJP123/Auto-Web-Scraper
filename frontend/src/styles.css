@@ -2,3 +2,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .gradient-bg {
+      @apply bg-gradient-to-r from-gray-500 to-black bg-[length:200%_200%];
+    }
+  }
