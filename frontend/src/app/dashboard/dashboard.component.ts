@@ -161,7 +161,7 @@ export class DashboardComponent {
       }),
       responseType: 'blob' as 'json'
     };
-    const API_KEY = process.env['API_KEY']
+    
     this.http.post<Blob>(`http://127.0.0.1:8000/scrape/forall`, payload, httpOptions)
       .subscribe((response: Blob) => {
         const a = document.createElement('a');
