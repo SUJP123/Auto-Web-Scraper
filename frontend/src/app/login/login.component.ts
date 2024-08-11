@@ -36,7 +36,7 @@ export class LoginComponent {
     };
     console.log(loginData);
 
-    this.http.post('http://localhost:5001/login', {
+    this.http.post('https://auto-scraper-922505351a64.herokuapp.com/login', {
       "email": loginData.email,
       "password": loginData.password
     }, httpOptions)

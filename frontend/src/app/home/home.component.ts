@@ -44,7 +44,7 @@ export class HomeComponent {
       if (registerData.password.length < 6 ) {
         return alert("Password must be a minimum length of 6.")
       } else {
-      this.http.post('http://localhost:5001/signup', {
+      this.http.post('https://auto-scraper-922505351a64.herokuapp.com/signup', {
         "email" : registerData.email,
         "password": registerData.password
       }, httpOptions).subscribe(

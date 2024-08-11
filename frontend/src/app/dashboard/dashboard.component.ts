@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent {
+
   apiForm: FormGroup;
   initial_length: number;
   param_length: number;
@@ -160,8 +161,8 @@ export class DashboardComponent {
       }),
       responseType: 'blob' as 'json'
     };
-
-    this.http.post<Blob>('http://127.0.0.1:8000/scrape/forall', payload, httpOptions)
+    const API_KEY = process.env['API_KEY']
+    this.http.post<Blob>(`http://127.0.0.1:8000/scrape/forall`, payload, httpOptions)
       .subscribe((response: Blob) => {
         const a = document.createElement('a');
         const objectUrl = URL.createObjectURL(response);
