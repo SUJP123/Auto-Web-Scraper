@@ -1,25 +1,15 @@
 const express = require('express');
-const path = require('path');
 
 const app = express();
-const staticPath = path.join(__dirname, 'dist/frontend/browser');
 
-app.use((req, res, next) => {
-    const mime = import('mime');
+app.use(express.static(__dirname + '/dist/frontend/browser'));
 
-  app.use((req, res, next) => {
+app.get('/*', (req, res) => {
     const type = mime.getType(req.path);
     if (type) {
       res.setHeader('Content-Type', type);
     }
-    next();
-    });
-});
-
-app.use(express.static(staticPath));
-
-app.get('/*', (req, res) => {
-    res.sendFile(path.join(staticPath, 'index.html'));
+    res.sendFile(__dirname +  '/dist/frontend/browser/index.html');
 });
 
 const port = process.env.PORT || 8080;
