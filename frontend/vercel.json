@@ -1,4 +1,20 @@
-{
+{   
+    "version": 2,
+  "builds": [
+    {
+      "src": "src/index.html",
+      "use": "@vercel/static-build",
+      "config": {
+        
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
     "rewrites": [
         { "source":"/(.*)", "destination":"/" }
     ]   
